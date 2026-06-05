@@ -1,0 +1,1179 @@
+openapi: 3.0.3
+info:
+  title: BidKita API
+  description: |
+    REST API untuk platform lelang barang secondhand BidKita.
+    
+    ## Auth
+    Semua endpoint yang membutuhkan auth menggunakan header:
+    `Authorization: Bearer <accessToken>`
+    
+    Token didapat dari POST /api/auth/login
+    
+    ## Roles
+    - **PUBLIC**: tidak butuh token
+    - **BUYER**: token dengan role BUYER
+    - **SELLER**: token dengan role SELLER  
+    - **ADMIN**: token dengan role ADMIN
+    - **AUTH**: token role apapun
+    
+    ## Seed Data
+    | Role | Email | Password |
+    |---|---|---|
+    | ADMIN | admin@bidkita.com | admin123 |
+    | SELLER | seller1@bidkita.com | seller123 |
+    | SELLER | seller2@bidkita.com | seller123 |
+    | BUYER | buyer1@bidkita.com | buyer123 |
+    | BUYER | buyer2@bidkita.com | buyer123 |
+    | BUYER | buyer3@bidkita.com | buyer123 |
+  version: 1.0.0
+  contact:
+    name: Kelompok 2 IF-48-12
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+tags:
+  - name: Auth
+    description: Register, login, get profile
+  - name: Auctions
+    description: Browse, buat, bid, dan kelola lelang
+  - name: Wallet
+    description: Saldo dan transaksi buyer
+  - name: Buyer
+    description: Aktivitas buyer
+  - name: Seller
+    description: Aktivitas seller
+  - name: Admin
+    description: Manajemen platform
+  - name: Notifications
+    description: Notifikasi user
+
+paths:
+
+  # ─────────────────────────────────────────
+  # AUTH
+  # ─────────────────────────────────────────
+
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register Buyer atau Seller
+      description: |
+        Membuat akun baru. Role hanya bisa BUYER atau SELLER.
+        Admin tidak bisa register — dibuat via seed data saja.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            examples:
+              registerBuyer:
+                summary: Register sebagai Buyer
+                value:
+                  username: "ahmadRizky"
+                  email: "buyer1@bidkita.com"
+                  password: "buyer123"
+                  phone: "081234567890"
+                  role: "BUYER"
+              registerSeller:
+                summary: Register sebagai Seller
+                value:
+                  username: "tokoElektronik"
+                  email: "seller1@bidkita.com"
+                  password: "seller123"
+                  phone: "081234567891"
+                  role: "SELLER"
+      responses:
+        '201':
+          description: Registrasi berhasil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+              example:
+                message: "Registrasi berhasil"
+        '400':
+          description: Validasi gagal atau email/username duplikat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                emailDuplikat:
+                  value:
+                    message: "Email sudah terdaftar"
+                usernamePendek:
+                  value:
+                    message: "Username minimal 3 karakter"
+                emailInvalid:
+                  value:
+                    message: "Email tidak valid"
+                phoneInvalid:
+                  value:
+                    message: "Nomor telepon harus diawali 08 atau +62"
+
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login dan dapatkan JWT token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              loginBuyer:
+                summary: Login sebagai Buyer
+                value:
+                  email: "buyer1@bidkita.com"
+                  password: "buyer123"
+              loginSeller:
+                summary: Login sebagai Seller
+                value:
+                  email: "seller1@bidkita.com"
+                  password: "seller123"
+              loginAdmin:
+                summary: Login sebagai Admin
+                value:
+                  email: "admin@bidkita.com"
+                  password: "admin123"
+      responses:
+        '200':
+          description: Login berhasil, return JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+              example:
+                accessToken: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1dWlkLWRpc2luaSJ9..."
+                userId: "550e8400-e29b-41d4-a716-446655440000"
+                role: "BUYER"
+                username: "ahmadRizky"
+        '401':
+          description: Email atau password salah
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Email atau password salah"
+
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      summary: Get profil user yang sedang login
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Data user yang sedang login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ─────────────────────────────────────────
+  # AUCTIONS
+  # ─────────────────────────────────────────
+
+  /api/auctions:
+    get:
+      tags: [Auctions]
+      summary: Browse semua lelang (public)
+      description: |
+        Menampilkan daftar lelang dengan filter opsional.
+        Tidak membutuhkan token.
+      security: []
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ELEKTRONIK, FASHION, BUKU, KENDARAAN]
+          description: Filter berdasarkan kategori barang
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [PENDING, OPEN, CLOSING, SOLD, CANCELLED]
+          description: Filter berdasarkan status lelang
+        - name: minPrice
+          in: query
+          required: false
+          schema:
+            type: number
+            format: double
+          description: Harga minimum (currentPrice)
+        - name: maxPrice
+          in: query
+          required: false
+          schema:
+            type: number
+            format: double
+          description: Harga maksimum (currentPrice)
+      responses:
+        '200':
+          description: Daftar lelang
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuctionResponse'
+              example:
+                - auctionId: "uuid-auction-1"
+                  title: "iPhone 13 Pro 256GB Mulus"
+                  category: "ELEKTRONIK"
+                  imageBase64: null
+                  status: "OPEN"
+                  currentPrice: 8900000
+                  remainingTimeSeconds: 518400
+                  sellerName: "tokoElektronik"
+                  totalBids: 2
+                  highestBidderUsername: "siti"
+                  buyNowPrice: null
+
+    post:
+      tags: [Auctions]
+      summary: Buat listing lelang baru (Seller)
+      description: |
+        Seller membuat listing barang untuk dilelang.
+        Status awal selalu PENDING — perlu approve admin sebelum bisa di-bid.
+        
+        Field kondisional berdasarkan category:
+        - ELEKTRONIK: brand, type, warrantyStatus
+        - FASHION: brand, size, material
+        - BUKU: author, publisher, publishYear
+        - KENDARAAN: brand, year, mileage, platNumber
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAuctionRequest'
+            examples:
+              elektronik:
+                summary: Buat lelang barang elektronik
+                value:
+                  category: "ELEKTRONIK"
+                  title: "Samsung Galaxy S22 Ultra"
+                  description: "Kondisi 95% mulus fullset"
+                  condition: "BEKAS_BAIK"
+                  imageBase64: null
+                  startingPrice: 7000000
+                  duration: 5
+                  buyNowPrice: 9500000
+                  brand: "Samsung"
+                  type: "Smartphone"
+                  warrantyStatus: false
+              fashion:
+                summary: Buat lelang barang fashion
+                value:
+                  category: "FASHION"
+                  title: "Adidas Ultraboost Size 42"
+                  description: "Sepatu original, pemakaian 3x"
+                  condition: "BEKAS_BAIK"
+                  imageBase64: null
+                  startingPrice: 500000
+                  duration: 3
+                  buyNowPrice: null
+                  brand: "Adidas"
+                  size: "42"
+                  material: "Knit + Rubber"
+              buku:
+                summary: Buat lelang buku
+                value:
+                  category: "BUKU"
+                  title: "Clean Code - Robert C. Martin"
+                  description: "Buku original, kondisi baik"
+                  condition: "BEKAS_BAIK"
+                  imageBase64: null
+                  startingPrice: 100000
+                  duration: 7
+                  buyNowPrice: null
+                  author: "Robert C. Martin"
+                  publisher: "Prentice Hall"
+                  publishYear: 2008
+              kendaraan:
+                summary: Buat lelang kendaraan
+                value:
+                  category: "KENDARAAN"
+                  title: "Honda Beat 2020 Plat B"
+                  description: "Kondisi terawat, pajak hidup"
+                  condition: "BEKAS_BAIK"
+                  imageBase64: null
+                  startingPrice: 12000000
+                  duration: 7
+                  buyNowPrice: null
+                  brand: "Honda"
+                  year: 2020
+                  mileage: 15000
+                  platNumber: "B 1234 ABC"
+      responses:
+        '201':
+          description: Lelang berhasil dibuat, status PENDING
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/auctions/{id}:
+    get:
+      tags: [Auctions]
+      summary: Detail satu lelang (public)
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/AuctionId'
+      responses:
+        '200':
+          description: Detail lelang
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionResponse'
+        '404':
+          description: Auction tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Auction tidak ditemukan"
+
+    delete:
+      tags: [Auctions]
+      summary: Hapus lelang (Admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AuctionId'
+      responses:
+        '204':
+          description: Lelang berhasil dihapus
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/auctions/{id}/approve:
+    put:
+      tags: [Auctions]
+      summary: Approve listing lelang (Admin)
+      description: |
+        Mengubah status lelang dari PENDING menjadi OPEN.
+        Setelah approved, lelang bisa di-bid oleh buyer.
+        Notifikasi AUCTION_APPROVED dikirim ke seller.
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AuctionId'
+      responses:
+        '200':
+          description: Lelang diapprove, status jadi OPEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/auctions/{id}/bid:
+    post:
+      tags: [Auctions]
+      summary: Pasang bid pada lelang (Buyer)
+      description: |
+        Buyer memasang tawaran pada lelang yang OPEN atau CLOSING.
+        
+        **Validasi (urutan):**
+        1. Status harus OPEN atau CLOSING
+        2. Amount harus > currentPrice
+        3. Saldo buyer harus >= amount
+        
+        **Efek samping:**
+        - Saldo buyer berkurang sebesar amount
+        - Saldo highest bidder lama dikembalikan (refund)
+        - Notifikasi OUTBID dikirim ke bidder yang dikalahkan
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AuctionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BidRequest'
+            example:
+              amount: 9200000
+      responses:
+        '200':
+          description: Bid berhasil dipasang
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+              example:
+                message: "Bid berhasil dipasang"
+        '400':
+          description: Gagal bid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lelangTutup:
+                  summary: Lelang tidak OPEN
+                  value:
+                    message: "Lelang tidak dalam status OPEN atau CLOSING"
+                bidRendah:
+                  summary: Bid terlalu rendah
+                  value:
+                    message: "Bid harus lebih tinggi dari harga saat ini"
+                saldoKurang:
+                  summary: Saldo tidak cukup
+                  value:
+                    message: "Saldo wallet tidak mencukupi"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/auctions/{id}/buynow:
+    post:
+      tags: [Auctions]
+      summary: Beli langsung dengan Buy Now (Buyer)
+      description: |
+        Buyer membeli barang langsung dengan harga buyNowPrice tanpa perlu nunggu lelang selesai.
+        
+        **Syarat:**
+        - Status lelang harus OPEN
+        - buyNowPrice harus ada (tidak null)
+        - Saldo buyer >= buyNowPrice
+        
+        **Efek samping:**
+        - Status auction jadi SOLD
+        - Saldo buyer berkurang sebesar buyNowPrice
+        - Saldo highest bidder aktif dikembalikan jika ada
+        - Notifikasi BUY_NOW_SUCCESS ke buyer
+        - Notifikasi ITEM_SOLD ke seller
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AuctionId'
+      responses:
+        '200':
+          description: Buy Now berhasil, status auction jadi SOLD
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionResponse'
+        '400':
+          description: Buy Now tidak bisa dilakukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tidakTersedia:
+                  value:
+                    message: "Buy Now tidak tersedia untuk lelang ini"
+                saldoKurang:
+                  value:
+                    message: "Saldo wallet tidak mencukupi"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ─────────────────────────────────────────
+  # WALLET
+  # ─────────────────────────────────────────
+
+  /api/wallet:
+    get:
+      tags: [Wallet]
+      summary: Lihat saldo dan riwayat transaksi wallet (Buyer)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Data wallet buyer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponse'
+              example:
+                walletId: "uuid-wallet"
+                balance: 10000000
+                transactions:
+                  - id: 1
+                    amount: 10000000
+                    type: "DEPOSIT"
+                    createdAt: "2026-05-21T14:00:00"
+                  - id: 2
+                    amount: 8700000
+                    type: "WITHDRAW"
+                    createdAt: "2026-05-21T15:00:00"
+                  - id: 3
+                    amount: 8700000
+                    type: "REFUND"
+                    createdAt: "2026-05-21T16:00:00"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/wallet/topup:
+    post:
+      tags: [Wallet]
+      summary: Top up saldo wallet (Buyer)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TopUpRequest'
+            examples:
+              topUpBank:
+                summary: Top up via transfer bank
+                value:
+                  amount: 1000000
+                  paymentMethod: "BANK_TRANSFER"
+              topUpQris:
+                summary: Top up via QRIS
+                value:
+                  amount: 500000
+                  paymentMethod: "QRIS"
+      responses:
+        '200':
+          description: Top up berhasil, return wallet terbaru
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponse'
+        '400':
+          description: Nominal tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Nominal deposit harus lebih dari 0"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ─────────────────────────────────────────
+  # BUYER
+  # ─────────────────────────────────────────
+
+  /api/buyer/bids:
+    get:
+      tags: [Buyer]
+      summary: Riwayat bid buyer yang sedang login
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Daftar bid yang pernah dipasang
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BidHistoryResponse'
+              example:
+                - bidId: "uuid-bid-1"
+                  amount: 8700000
+                  timestamp: "2026-05-21T15:00:00"
+                  auctionId: "uuid-auction-1"
+                  auctionTitle: "iPhone 13 Pro 256GB"
+                  auctionStatus: "OPEN"
+                  isWinning: false
+                - bidId: "uuid-bid-2"
+                  amount: 12500000
+                  timestamp: "2026-05-21T16:00:00"
+                  auctionId: "uuid-auction-2"
+                  auctionTitle: "MacBook Air M1 2021"
+                  auctionStatus: "OPEN"
+                  isWinning: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ─────────────────────────────────────────
+  # SELLER
+  # ─────────────────────────────────────────
+
+  /api/seller/auctions:
+    get:
+      tags: [Seller]
+      summary: Riwayat lelang milik seller yang sedang login
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Daftar auction milik seller
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuctionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ─────────────────────────────────────────
+  # ADMIN
+  # ─────────────────────────────────────────
+
+  /api/admin/users:
+    get:
+      tags: [Admin]
+      summary: Lihat semua user (Admin)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Daftar semua user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/admin/auctions:
+    get:
+      tags: [Admin]
+      summary: Lihat semua auction termasuk PENDING (Admin)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Daftar semua auction
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuctionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ─────────────────────────────────────────
+  # NOTIFICATIONS
+  # ─────────────────────────────────────────
+
+  /api/notifications:
+    get:
+      tags: [Notifications]
+      summary: Ambil semua notifikasi user yang sedang login
+      description: |
+        Mengambil semua notifikasi milik user yang login, diurutkan dari yang terbaru.
+        Semua notifikasi otomatis di-mark sebagai isRead = true setelah diambil.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Daftar notifikasi
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificationResponse'
+              example:
+                - notifId: "uuid-notif-1"
+                  message: "Bid kamu dikalahkan!"
+                  type: "OUTBID"
+                  isRead: false
+                  createdAt: "2026-05-21T16:00:00"
+                - notifId: "uuid-notif-2"
+                  message: "Selamat! Kamu memenangkan lelang!"
+                  type: "AUCTION_WON"
+                  isRead: false
+                  createdAt: "2026-05-21T18:00:00"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+# ─────────────────────────────────────────
+# COMPONENTS
+# ─────────────────────────────────────────
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token dari POST /api/auth/login
+
+  parameters:
+    AuctionId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: UUID dari auction
+      example: "550e8400-e29b-41d4-a716-446655440000"
+
+  responses:
+    Unauthorized:
+      description: Token tidak ada atau tidak valid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: "Unauthorized"
+    Forbidden:
+      description: Role tidak punya akses ke endpoint ini
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: "Forbidden"
+    BadRequest:
+      description: Request tidak valid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: "Pesan error spesifik"
+    NotFound:
+      description: Resource tidak ditemukan
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: "Resource tidak ditemukan"
+
+  schemas:
+
+    # ── REQUEST SCHEMAS ──────────────────────
+
+    RegisterRequest:
+      type: object
+      required: [username, email, password, phone, role]
+      properties:
+        username:
+          type: string
+          minLength: 3
+          description: Minimal 3 karakter, harus unik
+          example: "ahmadRizky"
+        email:
+          type: string
+          format: email
+          description: Format email valid, harus unik
+          example: "buyer1@bidkita.com"
+        password:
+          type: string
+          minLength: 8
+          description: Minimal 8 karakter
+          example: "buyer123"
+        phone:
+          type: string
+          description: Diawali 08 atau +62
+          example: "081234567890"
+        role:
+          type: string
+          enum: [BUYER, SELLER]
+          description: Hanya BUYER atau SELLER, Admin tidak bisa register
+          example: "BUYER"
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: "buyer1@bidkita.com"
+        password:
+          type: string
+          example: "buyer123"
+
+    CreateAuctionRequest:
+      type: object
+      required: [category, title, description, condition, startingPrice, duration]
+      properties:
+        category:
+          type: string
+          enum: [ELEKTRONIK, FASHION, BUKU, KENDARAAN]
+          example: "ELEKTRONIK"
+        title:
+          type: string
+          example: "Samsung Galaxy S22 Ultra"
+        description:
+          type: string
+          example: "Kondisi 95% mulus fullset"
+        condition:
+          type: string
+          enum: [BARU, BEKAS_BAIK, BEKAS_RUSAK]
+          example: "BEKAS_BAIK"
+        imageBase64:
+          type: string
+          nullable: true
+          description: "Format: data:image/jpeg;base64,..."
+          example: null
+        startingPrice:
+          type: number
+          format: double
+          minimum: 1
+          example: 7000000
+        duration:
+          type: integer
+          minimum: 1
+          description: Durasi lelang dalam hari
+          example: 5
+        buyNowPrice:
+          type: number
+          format: double
+          nullable: true
+          description: Harga beli langsung, null jika tidak tersedia
+          example: 9500000
+
+        # ELEKTRONIK
+        brand:
+          type: string
+          nullable: true
+          description: "Wajib untuk: ELEKTRONIK, FASHION, KENDARAAN"
+          example: "Samsung"
+        type:
+          type: string
+          nullable: true
+          description: "Wajib untuk: ELEKTRONIK"
+          example: "Smartphone"
+        warrantyStatus:
+          type: boolean
+          nullable: true
+          description: "Untuk: ELEKTRONIK"
+          example: false
+
+        # FASHION
+        size:
+          type: string
+          nullable: true
+          description: "Untuk: FASHION"
+          example: "42"
+        material:
+          type: string
+          nullable: true
+          description: "Untuk: FASHION"
+          example: "Knit + Rubber"
+
+        # BUKU
+        author:
+          type: string
+          nullable: true
+          description: "Untuk: BUKU"
+          example: "Robert C. Martin"
+        publisher:
+          type: string
+          nullable: true
+          description: "Untuk: BUKU"
+          example: "Prentice Hall"
+        publishYear:
+          type: integer
+          nullable: true
+          description: "Untuk: BUKU"
+          example: 2008
+
+        # KENDARAAN
+        year:
+          type: integer
+          nullable: true
+          description: "Untuk: KENDARAAN"
+          example: 2020
+        mileage:
+          type: integer
+          nullable: true
+          description: "Untuk: KENDARAAN — dalam km"
+          example: 15000
+        platNumber:
+          type: string
+          nullable: true
+          description: "Untuk: KENDARAAN"
+          example: "B 1234 ABC"
+
+    BidRequest:
+      type: object
+      required: [amount]
+      properties:
+        amount:
+          type: number
+          format: double
+          description: Nominal bid. Harus lebih tinggi dari currentPrice
+          example: 9200000
+
+    TopUpRequest:
+      type: object
+      required: [amount, paymentMethod]
+      properties:
+        amount:
+          type: number
+          format: double
+          minimum: 1
+          description: Nominal top up, harus lebih dari 0
+          example: 1000000
+        paymentMethod:
+          type: string
+          description: Metode pembayaran (tidak divalidasi backend)
+          example: "BANK_TRANSFER"
+
+    # ── RESPONSE SCHEMAS ──────────────────────
+
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT token untuk dipakai di header Authorization
+          example: "eyJhbGciOiJIUzI1NiJ9..."
+        userId:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        role:
+          type: string
+          enum: [BUYER, SELLER, ADMIN]
+          example: "BUYER"
+        username:
+          type: string
+          example: "ahmadRizky"
+
+    UserResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        username:
+          type: string
+          example: "ahmadRizky"
+        email:
+          type: string
+          example: "buyer1@bidkita.com"
+        phoneNumber:
+          type: string
+          example: "081234567890"
+        role:
+          type: string
+          enum: [BUYER, SELLER, ADMIN]
+        registeredAt:
+          type: string
+          format: date-time
+
+    AuctionResponse:
+      type: object
+      properties:
+        auctionId:
+          type: string
+          format: uuid
+        title:
+          type: string
+          example: "iPhone 13 Pro 256GB Mulus"
+        category:
+          type: string
+          enum: [ELEKTRONIK, FASHION, BUKU, KENDARAAN]
+          example: "ELEKTRONIK"
+        imageBase64:
+          type: string
+          nullable: true
+          description: "Gambar dalam format base64. Null jika tidak ada."
+        status:
+          type: string
+          enum: [PENDING, OPEN, CLOSING, SOLD, CANCELLED]
+          example: "OPEN"
+        currentPrice:
+          type: number
+          format: double
+          example: 8900000
+        remainingTimeSeconds:
+          type: integer
+          format: int64
+          description: Sisa waktu lelang dalam detik. 0 jika sudah berakhir.
+          example: 518400
+        sellerName:
+          type: string
+          example: "tokoElektronik"
+        totalBids:
+          type: integer
+          example: 2
+        highestBidderUsername:
+          type: string
+          nullable: true
+          description: Null jika belum ada yang bid
+          example: "siti"
+        buyNowPrice:
+          type: number
+          format: double
+          nullable: true
+          description: Null jika tidak tersedia
+          example: null
+
+    WalletResponse:
+      type: object
+      properties:
+        walletId:
+          type: string
+          format: uuid
+        balance:
+          type: number
+          format: double
+          example: 10000000
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletTransactionResponse'
+
+    WalletTransactionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        amount:
+          type: number
+          format: double
+          example: 10000000
+        type:
+          type: string
+          enum: [DEPOSIT, WITHDRAW, REFUND]
+          description: |
+            - DEPOSIT: top up saldo
+            - WITHDRAW: saldo keluar untuk bid atau buy now
+            - REFUND: saldo kembali karena di-outbid
+          example: "DEPOSIT"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-05-21T14:00:00"
+
+    BidHistoryResponse:
+      type: object
+      properties:
+        bidId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+          example: 8700000
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-05-21T15:00:00"
+        auctionId:
+          type: string
+          format: uuid
+        auctionTitle:
+          type: string
+          example: "iPhone 13 Pro 256GB"
+        auctionStatus:
+          type: string
+          enum: [PENDING, OPEN, CLOSING, SOLD, CANCELLED]
+          example: "OPEN"
+        isWinning:
+          type: boolean
+          description: True jika user ini adalah highest bidder saat ini
+          example: false
+
+    NotificationResponse:
+      type: object
+      properties:
+        notifId:
+          type: string
+          format: uuid
+        message:
+          type: string
+          example: "Bid kamu dikalahkan!"
+        type:
+          type: string
+          enum:
+            - OUTBID
+            - AUCTION_WON
+            - ITEM_SOLD
+            - AUCTION_CLOSING
+            - BUY_NOW_SUCCESS
+            - AUCTION_APPROVED
+            - AUCTION_CANCELLED
+          description: |
+            - OUTBID: bid dikalahkan oleh bidder lain
+            - AUCTION_WON: memenangkan lelang
+            - ITEM_SOLD: barang terjual (untuk seller)
+            - AUCTION_CLOSING: lelang hampir berakhir (≤ 15 menit)
+            - BUY_NOW_SUCCESS: berhasil beli langsung
+            - AUCTION_APPROVED: listing disetujui admin (untuk seller)
+            - AUCTION_CANCELLED: lelang dibatalkan karena tidak ada bidder
+          example: "OUTBID"
+        isRead:
+          type: boolean
+          description: Otomatis jadi true setelah diambil via GET /api/notifications
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-05-21T16:00:00"
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Operasi berhasil"
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Pesan error yang menjelaskan masalah
+          example: "Pesan error spesifik"
+ENDOFFILE
