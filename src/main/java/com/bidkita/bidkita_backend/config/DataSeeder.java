@@ -59,7 +59,7 @@ public class DataSeeder implements CommandLineRunner {
 
         Buyer buyer3 = new Buyer("budihartono", "buyer3@bidkita.com",
                 passwordEncoder.encode("buyer123"), "081234567895");
-        buyer3.getWallet().deposit(10_000_000);
+        buyer3.getWallet().deposit(15_000_000);
 
         userRepository.save(buyer1);
         userRepository.save(buyer2);

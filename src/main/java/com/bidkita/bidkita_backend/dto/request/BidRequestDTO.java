@@ -1,19 +1,12 @@
 package com.bidkita.bidkita_backend.dto.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class BidRequestDTO {
-
-    private double amount;
-
-    public BidRequestDTO() {}
-
-    public BidRequestDTO(double amount) {
-        this.amount = amount;
-    }
-
-    public double getAmount() { 
-        return amount; 
-    }
-    public void setAmount(double amount) {
-        this.amount = amount; 
-    }
+    private Double amount;
 }
