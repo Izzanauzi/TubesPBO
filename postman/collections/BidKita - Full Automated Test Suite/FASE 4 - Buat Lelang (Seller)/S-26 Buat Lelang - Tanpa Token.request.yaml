@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "category": "ELEKTRONIK",
+      "title": "Test",
+      "description": "Test",
+      "condition": "BARU",
+      "startingPrice": 100000,
+      "duration": 1
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test('Status code is 401 or 403', function () { pm.expect([401,403]).to.include(pm.response.code); });
+    language: text/javascript
+order: 4000

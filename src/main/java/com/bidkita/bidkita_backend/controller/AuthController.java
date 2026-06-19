@@ -3,6 +3,7 @@ package com.bidkita.bidkita_backend.controller;
 import com.bidkita.bidkita_backend.dto.request.LoginRequestDTO;
 import com.bidkita.bidkita_backend.dto.request.RegisterRequestDTO;
 import com.bidkita.bidkita_backend.dto.response.LoginResponseDTO;
+import com.bidkita.bidkita_backend.dto.response.UserResponseDTO;
 import com.bidkita.bidkita_backend.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<Object> getMe() {
+    public ResponseEntity<UserResponseDTO> getMe() {
         String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.ok(authService.getMe(userId));
     }

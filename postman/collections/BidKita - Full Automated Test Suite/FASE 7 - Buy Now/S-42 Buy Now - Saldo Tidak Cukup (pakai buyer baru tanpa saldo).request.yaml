@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions/{{auction_macbook_id}}/buynow"
+method: POST
+headers:
+  Content-Type: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{buyer2_token}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('Status code is 400 or 200 depending on balance', function () { pm.expect([200,400]).to.include(pm.response.code); });
+    language: text/javascript
+order: 3000

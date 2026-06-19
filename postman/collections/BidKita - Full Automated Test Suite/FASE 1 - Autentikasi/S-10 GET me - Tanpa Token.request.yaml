@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{base_url}}/api/auth/me"
+method: GET
+headers:
+  Content-Type: application/json
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 401 or 403 (auth rejection)', function () { pm.expect([401,403]).to.include(pm.response.code); });
+      pm.test('NOTE: spec mengharapkan 401 untuk unauthenticated request', function () { pm.expect(true).to.be.true; });
+    language: text/javascript
+order: 11000

@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions?category=ELEKTRONIK"
+method: GET
+headers:
+  Content-Type: application/json
+queryParams:
+  category: ELEKTRONIK
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 200', function () { pm.response.to.have.status(200); });
+      const arr = pm.response.json();
+      pm.test('Semua item kategori ELEKTRONIK', function () { arr.forEach(a => pm.expect(a.category).to.eql('ELEKTRONIK')); });
+    language: text/javascript
+order: 2000

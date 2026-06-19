@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions?status=OPEN"
+method: GET
+headers:
+  Content-Type: application/json
+queryParams:
+  status: OPEN
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 200', function () { pm.response.to.have.status(200); });
+      const arr = pm.response.json();
+      pm.test('Semua item status OPEN', function () { arr.forEach(a => pm.expect(a.status).to.eql('OPEN')); });
+    language: text/javascript
+order: 3000

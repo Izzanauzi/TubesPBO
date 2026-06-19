@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions?minPrice=5000000&maxPrice=15000000"
+method: GET
+headers:
+  Content-Type: application/json
+queryParams:
+  minPrice: "5000000"
+  maxPrice: "15000000"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 200', function () { pm.response.to.have.status(200); });
+      const arr = pm.response.json();
+      pm.test('Semua harga dalam range', function () { arr.forEach(a => { pm.expect(a.currentPrice).to.be.at.least(5000000); pm.expect(a.currentPrice).to.be.at.most(15000000); }); });
+    language: text/javascript
+order: 4000

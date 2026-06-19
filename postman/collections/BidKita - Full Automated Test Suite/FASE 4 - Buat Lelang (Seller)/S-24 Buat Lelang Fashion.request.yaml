@@ -1,0 +1,30 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "category": "FASHION",
+      "title": "Jaket Kulit Vintage",
+      "description": "Jaket kulit asli kondisi baik",
+      "condition": "BEKAS_BAIK",
+      "startingPrice": 350000,
+      "duration": 3,
+      "brand": "Levi's",
+      "size": "L",
+      "material": "Kulit Asli"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{seller_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 201', function () { pm.response.to.have.status(201); });
+      pm.collectionVariables.set('auction_id_to_delete', pm.response.json().auctionId);
+    language: text/javascript
+order: 2000

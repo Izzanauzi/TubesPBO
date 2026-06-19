@@ -1,0 +1,16 @@
+$kind: collection
+description: 48 skenario otomatis (S-01 s.d S-48) untuk BidKita backend. Jalankan via Collection Runner secara berurutan (Run in order).
+variables:
+  base_url: http://localhost:8080
+  admin_token: ""
+  buyer_token: ""
+  buyer_id: ""
+  buyer2_token: ""
+  buyer2_id: ""
+  seller_token: ""
+  auction_open_id: ""
+  auction_macbook_id: ""
+  auction_nobuynow_id: ""
+  auction_id_pending: ""
+  auction_id_to_delete: ""
+  auction_id_scheduler_test: ""

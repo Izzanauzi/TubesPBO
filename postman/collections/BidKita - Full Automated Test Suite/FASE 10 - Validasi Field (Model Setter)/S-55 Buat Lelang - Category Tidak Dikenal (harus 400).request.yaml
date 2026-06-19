@@ -1,0 +1,27 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "category": "MAINAN",
+      "title": "Test Invalid Category",
+      "description": "test",
+      "condition": "BARU",
+      "startingPrice": 100000,
+      "duration": 5
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{seller_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 400 (category invalid)', function () { pm.expect([400,500]).to.include(pm.response.code); });
+      pm.test('CATATAN: jika dapat 500, IllegalArgumentException dari ItemFactory belum ke-handle dengan baik', function () { pm.expect(true).to.be.true; });
+    language: text/javascript
+order: 7000

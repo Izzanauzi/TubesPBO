@@ -1,0 +1,29 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "category": "ELEKTRONIK",
+      "title": "MacBook Pro M2",
+      "description": "Mulus ex-developer",
+      "condition": "BEKAS_BAIK",
+      "startingPrice": 15000000,
+      "duration": 5,
+      "buyNowPrice": 18000000,
+      "brand": "Apple",
+      "type": "Laptop",
+      "warrantyStatus": true
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{seller_token}}"
+scripts:
+  - type: afterResponse
+    code: pm.collectionVariables.set('auction_elek_id', pm.response.json().auctionId);
+    language: text/javascript
+order: 1000

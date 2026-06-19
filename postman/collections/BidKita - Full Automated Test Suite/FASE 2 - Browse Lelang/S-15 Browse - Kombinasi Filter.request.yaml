@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions?category=ELEKTRONIK&status=OPEN&minPrice=8000000"
+method: GET
+headers:
+  Content-Type: application/json
+queryParams:
+  category: ELEKTRONIK
+  status: OPEN
+  minPrice: "8000000"
+scripts:
+  - type: afterResponse
+    code: pm.test('Status code is 200', function () { pm.response.to.have.status(200); });
+    language: text/javascript
+order: 5000

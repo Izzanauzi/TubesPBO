@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions/{{auction_id_to_delete}}"
+method: DELETE
+headers:
+  Content-Type: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{admin_token}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('Status code is 204', function () { pm.response.to.have.status(204); });
+    language: text/javascript
+order: 5000

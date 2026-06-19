@@ -36,6 +36,7 @@ public class AuctionService {
         this.itemFactory = itemFactory;
     }
 
+    @Transactional(readOnly = true)
     public List<AuctionResponseDTO> browse(String category, String status,
                                            Double minPrice, Double maxPrice) {
         return auctionRepository.findAll().stream()
@@ -47,15 +48,33 @@ public class AuctionService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public AuctionResponseDTO getDetail(String id) {
         Auction auction = auctionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction tidak ditemukan"));
         return toDTO(auction);
     }
 
+    @Transactional
     public AuctionResponseDTO createAuction(String sellerId, CreateAuctionRequestDTO dto) {
         Seller seller = (Seller) userRepository.findById(sellerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Seller tidak ditemukan"));
+
+        if (dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("Judul barang tidak boleh kosong");
+        }
+        if (dto.getDescription() == null || dto.getDescription().trim().isEmpty()) {
+            throw new IllegalArgumentException("Deskripsi barang tidak boleh kosong");
+        }
+        if (dto.getCondition() == null || dto.getCondition().trim().isEmpty()) {
+            throw new IllegalArgumentException("Kondisi barang tidak boleh kosong");
+        }
+        if (dto.getStartingPrice() == null || dto.getStartingPrice() <= 0) {
+            throw new IllegalArgumentException("Harga awal harus lebih dari 0");
+        }
+        if (dto.getDuration() == null || dto.getDuration() <= 0) {
+            throw new IllegalArgumentException("Durasi lelang harus lebih dari 0");
+        }
 
         Item item = itemFactory.create(dto);
         itemRepository.save(item);
@@ -68,6 +87,7 @@ public class AuctionService {
         return toDTO(auction);
     }
 
+    @Transactional
     public AuctionResponseDTO approveAuction(String auctionId) {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction tidak ditemukan"));
@@ -121,12 +141,14 @@ public class AuctionService {
         return toDTO(auction);
     }
 
+    @Transactional(readOnly = true)
     public List<AuctionResponseDTO> getSellerAuctions(String sellerId) {
         return auctionRepository.findBySellerUserId(sellerId).stream()
                 .map(this::toDTO)
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<AuctionResponseDTO> getAllAuctions() {
         return auctionRepository.findAll().stream().map(this::toDTO).toList();
     }

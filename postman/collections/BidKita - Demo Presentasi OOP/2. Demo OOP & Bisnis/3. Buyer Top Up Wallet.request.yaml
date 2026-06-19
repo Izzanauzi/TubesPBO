@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{base_url}}/api/wallet/topup"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "amount": 25000000,
+      "paymentMethod": "BANK_TRANSFER"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{buyer_token}}"
+order: 4000

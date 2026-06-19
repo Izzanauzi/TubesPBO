@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{base_url}}/api/auth/register"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "ab",
+      "email": "validemail50@email.com",
+      "password": "test123",
+      "phone": "081999000112",
+      "role": "BUYER"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test('Status code is 400', function () { pm.response.to.have.status(400); });
+    language: text/javascript
+order: 2000

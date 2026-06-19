@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions/auction-tidak-ada-12345/bid"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "amount": 999999
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{buyer_token}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('Status code is 404', function () { pm.response.to.have.status(404); });
+    language: text/javascript
+order: 2000

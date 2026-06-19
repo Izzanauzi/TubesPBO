@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{base_url}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "seller1@bidkita.com",
+      "password": "seller123"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 200', function () { pm.response.to.have.status(200); });
+      pm.test('Role is SELLER', function () { pm.expect(pm.response.json().role).to.eql('SELLER'); });
+      const j = pm.response.json();
+      pm.collectionVariables.set('seller_token', j.accessToken);
+    language: text/javascript
+order: 4000

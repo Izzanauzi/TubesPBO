@@ -1,0 +1,32 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "category": "ELEKTRONIK",
+      "title": "Samsung Galaxy S22 Ultra",
+      "description": "Kondisi 95% mulus fullset",
+      "condition": "BEKAS_BAIK",
+      "startingPrice": 7000000,
+      "duration": 5,
+      "buyNowPrice": 9500000,
+      "brand": "Samsung",
+      "type": "Smartphone",
+      "warrantyStatus": false
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{seller_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 201', function () { pm.response.to.have.status(201); });
+      pm.test('Status PENDING', function () { pm.expect(pm.response.json().status).to.eql('PENDING'); });
+      pm.collectionVariables.set('auction_id_pending', pm.response.json().auctionId);
+    language: text/javascript
+order: 1000

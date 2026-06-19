@@ -21,6 +21,7 @@ public class WalletService {
         this.userRepository = userRepository;
     }
 
+    @Transactional(readOnly = true)
     public WalletResponseDTO getWallet(String buyerId) {
         Buyer buyer = loadBuyer(buyerId);
         return toDTO(buyer);

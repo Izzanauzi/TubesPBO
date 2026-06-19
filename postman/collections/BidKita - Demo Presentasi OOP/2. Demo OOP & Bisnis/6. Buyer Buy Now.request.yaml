@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions/{{auction_elek_id}}/buynow"
+method: POST
+headers:
+  Content-Type: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{buyer_token}}"
+order: 7000

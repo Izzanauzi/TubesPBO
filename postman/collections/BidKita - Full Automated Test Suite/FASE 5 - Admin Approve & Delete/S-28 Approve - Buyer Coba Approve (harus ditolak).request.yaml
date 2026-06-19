@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions/{{auction_id_pending}}/approve"
+method: PUT
+headers:
+  Content-Type: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{buyer_token}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('Status code is 403', function () { pm.response.to.have.status(403); });
+    language: text/javascript
+order: 2000

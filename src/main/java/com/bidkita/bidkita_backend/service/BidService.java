@@ -51,6 +51,7 @@ public class BidService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<BidHistoryResponseDTO> getBidHistory(String buyerId) {
         Buyer buyer = (Buyer) userRepository.findById(buyerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Buyer tidak ditemukan"));

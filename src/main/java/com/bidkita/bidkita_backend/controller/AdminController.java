@@ -1,9 +1,9 @@
 package com.bidkita.bidkita_backend.controller;
 
 import com.bidkita.bidkita_backend.dto.response.AuctionResponseDTO;
-import com.bidkita.bidkita_backend.model.User;
-import com.bidkita.bidkita_backend.repository.UserRepository;
+import com.bidkita.bidkita_backend.dto.response.UserResponseDTO;
 import com.bidkita.bidkita_backend.service.AuctionService;
+import com.bidkita.bidkita_backend.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,18 +16,18 @@ import java.util.List;
 @RequestMapping("/api/admin")
 public class AdminController {
 
-    private final UserRepository userRepository;
+    private final AuthService authService;
     private final AuctionService auctionService;
 
-    public AdminController(UserRepository userRepository, AuctionService auctionService) {
-        this.userRepository = userRepository;
+    public AdminController(AuthService authService, AuctionService auctionService) {
+        this.authService = authService;
         this.auctionService = auctionService;
     }
 
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userRepository.findAll());
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        return ResponseEntity.ok(authService.getAllUsers());
     }
 
     @GetMapping("/auctions")

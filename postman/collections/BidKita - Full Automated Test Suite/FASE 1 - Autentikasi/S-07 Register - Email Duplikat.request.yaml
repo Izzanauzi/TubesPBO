@@ -1,0 +1,22 @@
+$kind: http-request
+url: "{{base_url}}/api/auth/register"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "duplikat",
+      "email": "buyer1@bidkita.com",
+      "password": "test123",
+      "phone": "081111111111",
+      "role": "BUYER"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 400', function () { pm.response.to.have.status(400); });
+      pm.test('Message sesuai', function () { pm.expect(pm.response.json().message).to.include('terdaftar'); });
+    language: text/javascript
+order: 8000

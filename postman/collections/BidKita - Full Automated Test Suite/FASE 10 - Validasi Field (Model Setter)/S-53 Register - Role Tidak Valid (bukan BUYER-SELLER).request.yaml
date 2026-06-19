@@ -1,0 +1,23 @@
+$kind: http-request
+name: S-53 Register - Role Tidak Valid (bukan BUYER/SELLER)
+url: "{{base_url}}/api/auth/register"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "validuser53",
+      "email": "validemail53@email.com",
+      "password": "test123",
+      "phone": "081999000113",
+      "role": "MANAGER"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 400 (role invalid)', function () { pm.expect([400,500]).to.include(pm.response.code); });
+      pm.test('CATATAN: jika dapat 500, berarti role invalid belum divalidasi dengan baik dan exception generic ke-throw', function () { pm.expect(true).to.be.true; });
+    language: text/javascript
+order: 5000

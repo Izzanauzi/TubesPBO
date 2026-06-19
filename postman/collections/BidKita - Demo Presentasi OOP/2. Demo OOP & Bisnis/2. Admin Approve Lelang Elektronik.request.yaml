@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions/{{auction_elek_id}}/approve"
+method: PUT
+headers:
+  Content-Type: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{admin_token}}"
+order: 3000

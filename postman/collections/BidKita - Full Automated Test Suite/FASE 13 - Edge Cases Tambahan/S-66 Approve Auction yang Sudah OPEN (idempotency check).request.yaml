@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions/{{auction_open_id}}/approve"
+method: PUT
+headers:
+  Content-Type: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{admin_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code 200 atau 400 (cek apakah re-approve auction yang sudah OPEN ditangani wajar)', function () { pm.expect([200,400]).to.include(pm.response.code); });
+      console.log('Body:', JSON.stringify(pm.response.json()));
+    language: text/javascript
+order: 3000

@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions/{{auction_open_id}}"
+method: GET
+headers:
+  Content-Type: application/json
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 200', function () { pm.response.to.have.status(200); });
+      pm.test('auctionId sesuai', function () { pm.expect(pm.response.json().auctionId).to.eql(pm.collectionVariables.get('auction_open_id')); });
+    language: text/javascript
+order: 6000

@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{base_url}}/api/wallet"
+method: GET
+headers:
+  Content-Type: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{buyer2_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 200', function () { pm.response.to.have.status(200); });
+      pm.test('Saldo buyer2 tercatat', function () { pm.expect(pm.response.json()).to.have.property('balance'); });
+      console.log('Saldo buyer2 saat ini:', pm.response.json().balance);
+    language: text/javascript
+order: 6000

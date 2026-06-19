@@ -1,0 +1,26 @@
+$kind: http-request
+name: S-54 Buat Lelang - StartingPrice Negatif/Nol (harus 400)
+url: "{{base_url}}/api/auctions"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "category": "ELEKTRONIK",
+      "title": "Test Invalid Price",
+      "description": "test",
+      "condition": "BARU",
+      "startingPrice": 0,
+      "duration": 5
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{seller_token}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('Status code is 400', function () { pm.response.to.have.status(400); });
+    language: text/javascript
+order: 6000

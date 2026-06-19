@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/api/wallet"
+method: GET
+headers:
+  Content-Type: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{seller_token}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('Status code is 403', function () { pm.response.to.have.status(403); });
+    language: text/javascript
+order: 5000

@@ -3,6 +3,7 @@ package com.bidkita.bidkita_backend.service;
 import com.bidkita.bidkita_backend.dto.request.LoginRequestDTO;
 import com.bidkita.bidkita_backend.dto.request.RegisterRequestDTO;
 import com.bidkita.bidkita_backend.dto.response.LoginResponseDTO;
+import com.bidkita.bidkita_backend.dto.response.UserResponseDTO;
 import com.bidkita.bidkita_backend.exception.EmailAlreadyExistsException;
 import com.bidkita.bidkita_backend.exception.InvalidCredentialsException;
 import com.bidkita.bidkita_backend.exception.ResourceNotFoundException;
@@ -13,6 +14,10 @@ import com.bidkita.bidkita_backend.repository.UserRepository;
 import com.bidkita.bidkita_backend.security.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.ZoneId;
+import java.util.List;
 
 @Service
 public class AuthService {
@@ -35,8 +40,12 @@ public class AuthService {
             throw new IllegalArgumentException("Username sudah digunakan");
         }
 
-        User user;
         String role = dto.getRole() == null ? "" : dto.getRole().toUpperCase();
+        if (!"BUYER".equals(role) && !"SELLER".equals(role)) {
+            throw new IllegalArgumentException("Role harus BUYER atau SELLER");
+        }
+
+        User user;
         if ("SELLER".equals(role)) {
             user = new Seller(dto.getUsername(), dto.getEmail(),
                     passwordEncoder.encode(dto.getPassword()), dto.getPhone());
@@ -59,8 +68,28 @@ public class AuthService {
         return new LoginResponseDTO(token, user.getUserId(), user.getRole(), user.getUsername());
     }
 
-    public User getMe(String userId) {
-        return userRepository.findById(userId)
+    public UserResponseDTO getMe(String userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User tidak ditemukan"));
+        return toUserDTO(user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserResponseDTO> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(this::toUserDTO)
+                .toList();
+    }
+
+    private UserResponseDTO toUserDTO(User user) {
+        UserResponseDTO dto = new UserResponseDTO();
+        dto.setUserId(user.getUserId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setPhoneNumber(user.getPhoneNumber());
+        dto.setRole(user.getRole());
+        dto.setRegisteredAt(user.getRegisteredAt().toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDateTime());
+        return dto;
     }
 }

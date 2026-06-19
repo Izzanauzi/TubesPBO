@@ -1,0 +1,21 @@
+$kind: http-request
+name: S-56 Top Up - Field Amount Hilang dari Body (harus 400, bukan 500)
+url: "{{base_url}}/api/wallet/topup"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "paymentMethod": "BANK_TRANSFER"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{buyer_token}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('Status code is 400 (bukan 500)', function () { pm.expect(pm.response.code).to.not.eql(500); });
+    language: text/javascript
+order: 8000

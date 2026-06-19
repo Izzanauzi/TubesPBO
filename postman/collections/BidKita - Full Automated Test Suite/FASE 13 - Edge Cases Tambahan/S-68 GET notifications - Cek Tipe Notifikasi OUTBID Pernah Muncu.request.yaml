@@ -1,0 +1,19 @@
+$kind: http-request
+name: S-68 GET notifications - Cek Tipe Notifikasi OUTBID Pernah Muncul
+url: "{{base_url}}/api/notifications"
+method: GET
+headers:
+  Content-Type: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{buyer2_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 200', function () { pm.response.to.have.status(200); });
+      const arr = pm.response.json();
+      const hasOutbid = arr.some(n => n.type === 'OUTBID');
+      pm.test('Ada notifikasi OUTBID untuk buyer2 (karena pernah dikalahkan di S-33)', function () { pm.expect(hasOutbid).to.be.true; });
+    language: text/javascript
+order: 5000

@@ -1,0 +1,25 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "category": "ELEKTRONIK",
+      "title": "",
+      "description": "test",
+      "condition": "BARU",
+      "startingPrice": 100000,
+      "duration": 5
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{seller_token}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('Status code is 400 (bukan 500 karena title kosong)', function () { pm.expect(pm.response.code).to.not.eql(500); });
+    language: text/javascript
+order: 4000

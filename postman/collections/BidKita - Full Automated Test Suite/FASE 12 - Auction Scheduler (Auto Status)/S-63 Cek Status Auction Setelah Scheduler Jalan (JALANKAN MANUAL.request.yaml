@@ -1,0 +1,14 @@
+$kind: http-request
+name: S-63 Cek Status Auction Setelah Scheduler Jalan (JALANKAN MANUAL setelah tunggu 60+ detik)
+url: "{{base_url}}/api/auctions/{{auction_id_scheduler_test}}"
+method: GET
+headers:
+  Content-Type: application/json
+scripts:
+  - type: afterResponse
+    code: |-
+      const j = pm.response.json();
+      pm.test('Status sudah berubah dari OPEN (CANCELLED karena tidak ada bidder, karena duration=0 sudah expired)', function () { pm.expect(j.status).to.not.eql('OPEN'); });
+      console.log('Status saat ini:', j.status, '- harus CANCELLED karena tidak ada highestBidder dan waktu sudah habis');
+    language: text/javascript
+order: 3000

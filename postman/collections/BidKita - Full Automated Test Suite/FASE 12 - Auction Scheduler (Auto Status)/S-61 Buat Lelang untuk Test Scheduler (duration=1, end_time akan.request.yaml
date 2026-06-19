@@ -1,0 +1,37 @@
+$kind: http-request
+name: S-61 Buat Lelang untuk Test Scheduler (duration=1, end_time akan dimanipulasi via SQL)
+url: "{{base_url}}/api/auctions"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "category": "BUKU",
+      "title": "Test Item Untuk Scheduler - Durasi Pendek",
+      "description": "Item ini dibuat khusus untuk uji AuctionScheduler auto-transition",
+      "condition": "BARU",
+      "startingPrice": 50000,
+      "duration": 1,
+      "author": "Test Author",
+      "publisher": "Test Publisher",
+      "publishYear": 2024
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{seller_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 201', function () { pm.response.to.have.status(201); });
+      const j = pm.response.json();
+      pm.collectionVariables.set('auction_id_scheduler_test', j.auctionId);
+      console.log('=== PENTING ===');
+      console.log('auction_id_scheduler_test =', j.auctionId);
+      console.log('Setelah S-62 (approve), jalankan SQL berikut di DBeaver SEBELUM lanjut ke S-63:');
+      console.log("UPDATE auctions SET end_time = NOW() - INTERVAL '1 hour' WHERE auction_id = '" + j.auctionId + "';");
+      console.log('Lalu tunggu maksimal 60 detik (siklus AuctionScheduler) sebelum jalankan S-63.');
+    language: text/javascript
+order: 1000

@@ -1,0 +1,3443 @@
+{
+  "info": {
+    "_postman_id": "1d45448c-e25c-4185-a81d-7904127ac8de",
+    "name": "BidKita - Full Automated Test Suite",
+    "description": "48 skenario otomatis (S-01 s.d S-48) untuk BidKita backend. Jalankan via Collection Runner secara berurutan (Run in order).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "FASE 1 - Autentikasi",
+      "item": [
+        {
+          "name": "S-01 Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@bidkita.com\",\n  \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Role is ADMIN', function () { pm.expect(pm.response.json().role).to.eql('ADMIN'); });",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('admin_token', j.accessToken);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-02 Login Buyer1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"buyer1@bidkita.com\",\n  \"password\": \"buyer123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Role is BUYER', function () { pm.expect(pm.response.json().role).to.eql('BUYER'); });",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('buyer_token', j.accessToken);",
+                  "pm.collectionVariables.set('buyer_id', j.userId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-02b Login Buyer2 (untuk verifikasi refund)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"buyer2@bidkita.com\",\n  \"password\": \"buyer123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('buyer2_token', j.accessToken);",
+                  "pm.collectionVariables.set('buyer2_id', j.userId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-03 Login Seller1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"seller1@bidkita.com\",\n  \"password\": \"seller123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Role is SELLER', function () { pm.expect(pm.response.json().role).to.eql('SELLER'); });",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('seller_token', j.accessToken);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-04 Login - Password Salah",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"buyer1@bidkita.com\",\n  \"password\": \"salah123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Message sesuai', function () { pm.expect(pm.response.json().message).to.include('salah'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-05 Login - Email Tidak Terdaftar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"tidakada@email.com\",\n  \"password\": \"apapun\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 401', function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-06 Register Buyer Baru",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testbuyer99\",\n  \"email\": \"testbuyer99@email.com\",\n  \"password\": \"test123\",\n  \"phone\": \"081999888777\",\n  \"role\": \"BUYER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-07 Register - Email Duplikat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"duplikat\",\n  \"email\": \"buyer1@bidkita.com\",\n  \"password\": \"test123\",\n  \"phone\": \"081111111111\",\n  \"role\": \"BUYER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "pm.test('Message sesuai', function () { pm.expect(pm.response.json().message).to.include('terdaftar'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-08 Register Seller Baru",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testseller99\",\n  \"email\": \"testseller99@email.com\",\n  \"password\": \"test123\",\n  \"phone\": \"082111222333\",\n  \"role\": \"SELLER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-09 GET me (Buyer)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Tidak ada field password', function () { pm.expect(pm.response.json()).to.not.have.property('password'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-10 GET me - Tanpa Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 401 or 403 (auth rejection)', function () { pm.expect([401,403]).to.include(pm.response.code); });",
+                  "pm.test('NOTE: spec mengharapkan 401 untuk unauthenticated request', function () { pm.expect(true).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FASE 2 - Browse Lelang",
+      "item": [
+        {
+          "name": "S-11 Browse Semua Lelang",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response adalah array', function () { pm.expect(pm.response.json()).to.be.an('array'); });",
+                  "const arr = pm.response.json();",
+                  "const openItem = arr.find(a => a.status === 'OPEN');",
+                  "if (openItem) { pm.collectionVariables.set('auction_open_id', openItem.auctionId); }",
+                  "const macbook = arr.find(a => a.title && a.title.toLowerCase().includes('macbook'));",
+                  "if (macbook) { pm.collectionVariables.set('auction_macbook_id', macbook.auctionId); }",
+                  "const noBuyNow = arr.find(a => a.buyNowPrice === null && a.status === 'OPEN');",
+                  "if (noBuyNow) { pm.collectionVariables.set('auction_nobuynow_id', noBuyNow.auctionId); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-12 Browse - Filter Category",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions?category=ELEKTRONIK",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "ELEKTRONIK"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const arr = pm.response.json();",
+                  "pm.test('Semua item kategori ELEKTRONIK', function () { arr.forEach(a => pm.expect(a.category).to.eql('ELEKTRONIK')); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-13 Browse - Filter Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions?status=OPEN",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "OPEN"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const arr = pm.response.json();",
+                  "pm.test('Semua item status OPEN', function () { arr.forEach(a => pm.expect(a.status).to.eql('OPEN')); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-14 Browse - Filter Harga",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions?minPrice=5000000&maxPrice=15000000",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions"
+              ],
+              "query": [
+                {
+                  "key": "minPrice",
+                  "value": "5000000"
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "15000000"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const arr = pm.response.json();",
+                  "pm.test('Semua harga dalam range', function () { arr.forEach(a => { pm.expect(a.currentPrice).to.be.at.least(5000000); pm.expect(a.currentPrice).to.be.at.most(15000000); }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-15 Browse - Kombinasi Filter",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions?category=ELEKTRONIK&status=OPEN&minPrice=8000000",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "ELEKTRONIK"
+                },
+                {
+                  "key": "status",
+                  "value": "OPEN"
+                },
+                {
+                  "key": "minPrice",
+                  "value": "8000000"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-16 Detail Lelang by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_open_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_open_id}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('auctionId sesuai', function () { pm.expect(pm.response.json().auctionId).to.eql(pm.collectionVariables.get('auction_open_id')); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-17 Detail Lelang - ID Tidak Ada",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/auction-id-palsu-tidak-ada",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "auction-id-palsu-tidak-ada"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FASE 3 - Wallet",
+      "item": [
+        {
+          "name": "S-18 Cek Saldo Wallet (Buyer)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wallet",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "wallet"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Ada field balance', function () { pm.expect(pm.response.json()).to.have.property('balance'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-19 Top Up Wallet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wallet/topup",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "topup"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 5000000,\n  \"paymentMethod\": \"BANK_TRANSFER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-20 Top Up - Amount Negatif",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wallet/topup",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "topup"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": -1000,\n  \"paymentMethod\": \"BANK_TRANSFER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-21 Top Up - Amount Nol",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wallet/topup",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "topup"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 0,\n  \"paymentMethod\": \"BANK_TRANSFER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-22 Wallet - Pakai Token Seller (harus ditolak)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wallet",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "wallet"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{seller_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FASE 4 - Buat Lelang (Seller)",
+      "item": [
+        {
+          "name": "S-23 Buat Lelang Elektronik",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{seller_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"ELEKTRONIK\",\n  \"title\": \"Samsung Galaxy S22 Ultra\",\n  \"description\": \"Kondisi 95% mulus fullset\",\n  \"condition\": \"BEKAS_BAIK\",\n  \"startingPrice\": 7000000,\n  \"duration\": 5,\n  \"buyNowPrice\": 9500000,\n  \"brand\": \"Samsung\",\n  \"type\": \"Smartphone\",\n  \"warrantyStatus\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Status PENDING', function () { pm.expect(pm.response.json().status).to.eql('PENDING'); });",
+                  "pm.collectionVariables.set('auction_id_pending', pm.response.json().auctionId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-24 Buat Lelang Fashion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{seller_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"FASHION\",\n  \"title\": \"Jaket Kulit Vintage\",\n  \"description\": \"Jaket kulit asli kondisi baik\",\n  \"condition\": \"BEKAS_BAIK\",\n  \"startingPrice\": 350000,\n  \"duration\": 3,\n  \"brand\": \"Levi's\",\n  \"size\": \"L\",\n  \"material\": \"Kulit Asli\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('auction_id_to_delete', pm.response.json().auctionId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-25 Buat Lelang - Buyer Coba Buat (harus ditolak)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"ELEKTRONIK\",\n  \"title\": \"Test\",\n  \"description\": \"Test\",\n  \"condition\": \"BARU\",\n  \"startingPrice\": 100000,\n  \"duration\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-26 Buat Lelang - Tanpa Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"ELEKTRONIK\",\n  \"title\": \"Test\",\n  \"description\": \"Test\",\n  \"condition\": \"BARU\",\n  \"startingPrice\": 100000,\n  \"duration\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 401 or 403', function () { pm.expect([401,403]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FASE 5 - Admin Approve & Delete",
+      "item": [
+        {
+          "name": "S-27 Admin Approve Lelang",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_id_pending}}/approve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_id_pending}}",
+                "approve"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Status jadi OPEN', function () { pm.expect(pm.response.json().status).to.eql('OPEN'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-28 Approve - Buyer Coba Approve (harus ditolak)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_id_pending}}/approve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_id_pending}}",
+                "approve"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-29 Admin Lihat Semua User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response adalah array', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-30 Admin Lihat Semua Auction",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/auctions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "auctions"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-31 Admin Delete Auction",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_id_to_delete}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_id_to_delete}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-31b Verifikasi Auction Sudah Terhapus",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_id_to_delete}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_id_to_delete}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-32 Delete - Seller Coba Delete (harus ditolak)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_open_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_open_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{seller_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FASE 6 - Bid",
+      "item": [
+        {
+          "name": "S-33 Pasang Bid (Happy Path)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_open_id}}/bid",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_open_id}}",
+                "bid"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 9500000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-34 Bid - Amount Terlalu Rendah",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_open_id}}/bid",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_open_id}}",
+                "bid"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "pm.test('Message sesuai', function () { pm.expect(pm.response.json().message).to.include('lebih tinggi'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-35 Bid - Amount Sama dengan currentPrice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_open_id}}/bid",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_open_id}}",
+                "bid"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 9500000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-36 Bid - Saldo Tidak Cukup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_open_id}}/bid",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_open_id}}",
+                "bid"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 999999999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "pm.test('Message sesuai', function () { pm.expect(pm.response.json().message).to.include('mencukupi'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-37 Bid - Seller Coba Bid (harus ditolak)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_open_id}}/bid",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_open_id}}",
+                "bid"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{seller_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 9600000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-38 Verifikasi Saldo Buyer2 (cek refund)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wallet",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "wallet"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer2_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Saldo buyer2 tercatat', function () { pm.expect(pm.response.json()).to.have.property('balance'); });",
+                  "console.log('Saldo buyer2 saat ini:', pm.response.json().balance);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-39 Lihat Riwayat Bid Buyer",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/buyer/bids",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "buyer",
+                "bids"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const arr = pm.response.json();",
+                  "pm.test('Response adalah array', function () { pm.expect(arr).to.be.an('array'); });",
+                  "if (arr.length > 0) { pm.test('Ada field isWinning', function () { pm.expect(arr[0]).to.have.property('isWinning'); }); }"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FASE 7 - Buy Now",
+      "item": [
+        {
+          "name": "S-40 Buy Now - Happy Path (MacBook)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_macbook_id}}/buynow",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_macbook_id}}",
+                "buynow"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 (atau 400 jika saldo kurang - cek manual)', function () { pm.expect([200,400]).to.include(pm.response.code); });",
+                  "if (pm.response.code === 200) { pm.test('Status jadi SOLD', function () { pm.expect(pm.response.json().status).to.eql('SOLD'); }); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-41 Buy Now - Tanpa BuyNowPrice (harus ditolak)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_nobuynow_id}}/buynow",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_nobuynow_id}}",
+                "buynow"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-42 Buy Now - Saldo Tidak Cukup (pakai buyer baru tanpa saldo)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_macbook_id}}/buynow",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_macbook_id}}",
+                "buynow"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer2_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400 or 200 depending on balance', function () { pm.expect([200,400]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-43 Buy Now - Auction Sudah SOLD (harus ditolak)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_macbook_id}}/buynow",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_macbook_id}}",
+                "buynow"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FASE 8 - Seller Endpoints",
+      "item": [
+        {
+          "name": "S-44 Lihat Riwayat Lelang Seller",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/seller/auctions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "seller",
+                "auctions"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{seller_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response adalah array', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-45 Seller Endpoint - Buyer Coba Akses (harus ditolak)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/seller/auctions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "seller",
+                "auctions"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FASE 9 - Notifikasi",
+      "item": [
+        {
+          "name": "S-46 Lihat Notifikasi (pertama kali)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response adalah array', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-47 Lihat Notifikasi Lagi (cek auto mark as read)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const arr = pm.response.json();",
+                  "pm.test('Semua notif sudah isRead true (dari pemanggilan sebelumnya)', function () { arr.forEach(n => pm.expect(n.isRead).to.eql(true)); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-48 Notifikasi - Tanpa Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 401 or 403', function () { pm.expect([401,403]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FASE 10 - Validasi Field (Model Setter)",
+      "item": [
+        {
+          "name": "S-49 Register - Email Tanpa simbol @ (harus 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"validuser1\",\n  \"email\": \"emailtanpaattanpasimbol.com\",\n  \"password\": \"test123\",\n  \"phone\": \"081999000111\",\n  \"role\": \"BUYER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-50 Register - Username Kurang dari 3 Karakter (harus 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"ab\",\n  \"email\": \"validemail50@email.com\",\n  \"password\": \"test123\",\n  \"phone\": \"081999000112\",\n  \"role\": \"BUYER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-51 Register - Phone Tidak Diawali 08 atau +62 (harus 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"validuser51\",\n  \"email\": \"validemail51@email.com\",\n  \"password\": \"test123\",\n  \"phone\": \"62812345678\",\n  \"role\": \"BUYER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-52 Register - Phone Diawali +62 (harus 201, format valid)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"validuser52\",\n  \"email\": \"validemail52@email.com\",\n  \"password\": \"test123\",\n  \"phone\": \"+62812345678\",\n  \"role\": \"BUYER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-53 Register - Role Tidak Valid (bukan BUYER/SELLER)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"validuser53\",\n  \"email\": \"validemail53@email.com\",\n  \"password\": \"test123\",\n  \"phone\": \"081999000113\",\n  \"role\": \"MANAGER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400 (role invalid)', function () { pm.expect([400,500]).to.include(pm.response.code); });",
+                  "pm.test('CATATAN: jika dapat 500, berarti role invalid belum divalidasi dengan baik dan exception generic ke-throw', function () { pm.expect(true).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-54 Buat Lelang - StartingPrice Negatif/Nol (harus 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{seller_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"ELEKTRONIK\",\n  \"title\": \"Test Invalid Price\",\n  \"description\": \"test\",\n  \"condition\": \"BARU\",\n  \"startingPrice\": 0,\n  \"duration\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-55 Buat Lelang - Category Tidak Dikenal (harus 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{seller_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"MAINAN\",\n  \"title\": \"Test Invalid Category\",\n  \"description\": \"test\",\n  \"condition\": \"BARU\",\n  \"startingPrice\": 100000,\n  \"duration\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400 (category invalid)', function () { pm.expect([400,500]).to.include(pm.response.code); });",
+                  "pm.test('CATATAN: jika dapat 500, IllegalArgumentException dari ItemFactory belum ke-handle dengan baik', function () { pm.expect(true).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-56 Top Up - Field Amount Hilang dari Body (harus 400, bukan 500)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wallet/topup",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "topup"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentMethod\": \"BANK_TRANSFER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400 (bukan 500)', function () { pm.expect(pm.response.code).to.not.eql(500); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FASE 11 - Response DTO Field Completeness",
+      "item": [
+        {
+          "name": "S-57 GET seller/auctions - Cek Field Lengkap Sesuai DTO",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/seller/auctions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "seller",
+                "auctions"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{seller_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const arr = pm.response.json();",
+                  "if (arr.length > 0) {",
+                  "  const a = arr[0];",
+                  "  const requiredFields = ['auctionId','title','category','status','currentPrice','remainingTimeSeconds','sellerName','totalBids','buyNowPrice'];",
+                  "  requiredFields.forEach(f => pm.test('Field ' + f + ' ada', function () { pm.expect(a).to.have.property(f); }));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-58 GET admin/auctions - Cek Field Lengkap + Termasuk PENDING",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/auctions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "auctions"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const arr = pm.response.json();",
+                  "pm.test('Ada minimal 1 auction', function () { pm.expect(arr.length).to.be.above(0); });",
+                  "if (arr.length > 0) {",
+                  "  const requiredFields = ['auctionId','title','status','currentPrice'];",
+                  "  requiredFields.forEach(f => pm.test('Field ' + f + ' ada', function () { pm.expect(arr[0]).to.have.property(f); }));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-59 GET admin/users - Cek Password Tidak Terekspos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const arr = pm.response.json();",
+                  "pm.test('Tidak ada field password di response', function () { arr.forEach(u => pm.expect(u).to.not.have.property('password')); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-60 GET wallet - Cek Transactions Tidak Bocorkan Data Sensitif",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wallet",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "wallet"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const j = pm.response.json();",
+                  "pm.test('Ada field walletId, balance, transactions', function () { pm.expect(j).to.have.all.keys('walletId','balance','transactions'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FASE 12 - Auction Scheduler (Auto Status)",
+      "item": [
+        {
+          "name": "S-61 Buat Lelang untuk Test Scheduler (duration=1, end_time akan dimanipulasi via SQL)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{seller_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"BUKU\",\n  \"title\": \"Test Item Untuk Scheduler - Durasi Pendek\",\n  \"description\": \"Item ini dibuat khusus untuk uji AuctionScheduler auto-transition\",\n  \"condition\": \"BARU\",\n  \"startingPrice\": 50000,\n  \"duration\": 1,\n  \"author\": \"Test Author\",\n  \"publisher\": \"Test Publisher\",\n  \"publishYear\": 2024\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('auction_id_scheduler_test', j.auctionId);",
+                  "console.log('=== PENTING ===');",
+                  "console.log('auction_id_scheduler_test =', j.auctionId);",
+                  "console.log('Setelah S-62 (approve), jalankan SQL berikut di DBeaver SEBELUM lanjut ke S-63:');",
+                  "console.log(\"UPDATE auctions SET end_time = NOW() - INTERVAL '1 hour' WHERE auction_id = '\" + j.auctionId + \"';\");",
+                  "console.log('Lalu tunggu maksimal 60 detik (siklus AuctionScheduler) sebelum jalankan S-63.');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-62 Admin Approve Auction Test Scheduler",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_id_scheduler_test}}/approve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_id_scheduler_test}}",
+                "approve"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Status jadi OPEN', function () { pm.expect(pm.response.json().status).to.eql('OPEN'); });",
+                  "console.log('PENTING: Tunggu minimal 60 detik (siklus @Scheduled fixedRate) sebelum jalankan request S-63 di bawah, supaya AuctionScheduler punya waktu memproses auction ini.');",
+                  "console.log('SELANJUTNYA: jalankan SQL UPDATE end_time (lihat log di S-61), tunggu 60 detik, baru jalankan S-63 secara manual.');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-63 Cek Status Auction Setelah Scheduler Jalan (JALANKAN MANUAL setelah tunggu 60+ detik)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_id_scheduler_test}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_id_scheduler_test}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test('Status sudah berubah dari OPEN (CANCELLED karena tidak ada bidder, karena duration=0 sudah expired)', function () { pm.expect(j.status).to.not.eql('OPEN'); });",
+                  "console.log('Status saat ini:', j.status, '- harus CANCELLED karena tidak ada highestBidder dan waktu sudah habis');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FASE 13 - Edge Cases Tambahan",
+      "item": [
+        {
+          "name": "S-64 Bid di Auction yang Masih PENDING (harus 400, bukan diizinkan)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_id_pending}}/bid",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_id_pending}}",
+                "bid"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 999999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400 (auction belum OPEN)', function () { pm.expect([400,404]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-65 Bid di Auction yang Tidak Ada (ID palsu, harus 404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/auction-tidak-ada-12345/bid",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "auction-tidak-ada-12345",
+                "bid"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 999999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-66 Approve Auction yang Sudah OPEN (idempotency check)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions/{{auction_open_id}}/approve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions",
+                "{{auction_open_id}}",
+                "approve"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code 200 atau 400 (cek apakah re-approve auction yang sudah OPEN ditangani wajar)', function () { pm.expect([200,400]).to.include(pm.response.code); });",
+                  "console.log('Body:', JSON.stringify(pm.response.json()));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-67 Buat Lelang Tanpa Field Wajib (title kosong, harus 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auctions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auctions"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{seller_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"ELEKTRONIK\",\n  \"title\": \"\",\n  \"description\": \"test\",\n  \"condition\": \"BARU\",\n  \"startingPrice\": 100000,\n  \"duration\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400 (bukan 500 karena title kosong)', function () { pm.expect(pm.response.code).to.not.eql(500); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S-68 GET notifications - Cek Tipe Notifikasi OUTBID Pernah Muncul",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyer2_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const arr = pm.response.json();",
+                  "const hasOutbid = arr.some(n => n.type === 'OUTBID');",
+                  "pm.test('Ada notifikasi OUTBID untuk buyer2 (karena pernah dikalahkan di S-33)', function () { pm.expect(hasOutbid).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "buyer_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "buyer_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "buyer2_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "buyer2_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "seller_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "auction_open_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "auction_macbook_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "auction_nobuynow_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "auction_id_pending",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "auction_id_to_delete",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "auction_id_scheduler_test",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

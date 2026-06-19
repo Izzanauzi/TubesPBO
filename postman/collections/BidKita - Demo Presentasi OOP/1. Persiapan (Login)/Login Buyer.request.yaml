@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{base_url}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "email": "buyer1@bidkita.com",
+      "password": "buyer123"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.collectionVariables.set('buyer_token', pm.response.json().accessToken);
+    language: text/javascript
+order: 3000

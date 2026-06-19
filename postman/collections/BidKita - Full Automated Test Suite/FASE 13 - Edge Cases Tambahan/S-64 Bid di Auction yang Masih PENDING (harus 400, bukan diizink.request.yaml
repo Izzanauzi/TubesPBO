@@ -1,0 +1,21 @@
+$kind: http-request
+name: S-64 Bid di Auction yang Masih PENDING (harus 400, bukan diizinkan)
+url: "{{base_url}}/api/auctions/{{auction_id_pending}}/bid"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "amount": 999999
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{buyer_token}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('Status code is 400 (auction belum OPEN)', function () { pm.expect([400,404]).to.include(pm.response.code); });
+    language: text/javascript
+order: 1000

@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{base_url}}/api/notifications"
+method: GET
+headers:
+  Content-Type: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{buyer_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 200', function () { pm.response.to.have.status(200); });
+      const arr = pm.response.json();
+      pm.test('Semua notif sudah isRead true (dari pemanggilan sebelumnya)', function () { arr.forEach(n => pm.expect(n.isRead).to.eql(true)); });
+    language: text/javascript
+order: 2000

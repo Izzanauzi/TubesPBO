@@ -1,0 +1,28 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "category": "FASHION",
+      "title": "Sepatu Jordan 1",
+      "description": "Jarang dipakai",
+      "condition": "BEKAS_BAIK",
+      "startingPrice": 2000000,
+      "duration": 3,
+      "brand": "Nike",
+      "size": "42",
+      "material": "Leather"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{seller_token}}"
+scripts:
+  - type: afterResponse
+    code: pm.collectionVariables.set('auction_fash_id', pm.response.json().auctionId);
+    language: text/javascript
+order: 2000

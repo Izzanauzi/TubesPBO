@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions/{{auction_id_scheduler_test}}/approve"
+method: PUT
+headers:
+  Content-Type: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{admin_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 200', function () { pm.response.to.have.status(200); });
+      pm.test('Status jadi OPEN', function () { pm.expect(pm.response.json().status).to.eql('OPEN'); });
+      console.log('PENTING: Tunggu minimal 60 detik (siklus @Scheduled fixedRate) sebelum jalankan request S-63 di bawah, supaya AuctionScheduler punya waktu memproses auction ini.');
+      console.log('SELANJUTNYA: jalankan SQL UPDATE end_time (lihat log di S-61), tunggu 60 detik, baru jalankan S-63 secara manual.');
+    language: text/javascript
+order: 2000

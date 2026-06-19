@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{base_url}}/api/auctions"
+method: GET
+headers:
+  Content-Type: application/json
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 200', function () { pm.response.to.have.status(200); });
+      pm.test('Response adalah array', function () { pm.expect(pm.response.json()).to.be.an('array'); });
+      const arr = pm.response.json();
+      const openItem = arr.find(a => a.status === 'OPEN');
+      if (openItem) { pm.collectionVariables.set('auction_open_id', openItem.auctionId); }
+      const macbook = arr.find(a => a.title && a.title.toLowerCase().includes('macbook'));
+      if (macbook) { pm.collectionVariables.set('auction_macbook_id', macbook.auctionId); }
+      const noBuyNow = arr.find(a => a.buyNowPrice === null && a.status === 'OPEN');
+      if (noBuyNow) { pm.collectionVariables.set('auction_nobuynow_id', noBuyNow.auctionId); }
+    language: text/javascript
+order: 1000
