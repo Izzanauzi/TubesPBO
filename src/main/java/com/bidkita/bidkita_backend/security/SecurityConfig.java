@@ -58,11 +58,19 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:8081"));
+        
+        // Menggunakan AllowedOriginPatterns agar wildcard "*" diizinkan bersamaan dengan AllowCredentials
+        config.setAllowedOriginPatterns(List.of("*"));
+        
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
-        return request -> config;
+        
+        // Menggunakan UrlBasedCorsConfigurationSource lebih disarankan untuk mapping endpoint
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);    
+        
+        return source;
     }
 
     @Bean

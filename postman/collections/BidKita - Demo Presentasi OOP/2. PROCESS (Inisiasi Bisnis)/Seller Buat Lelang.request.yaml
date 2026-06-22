@@ -9,11 +9,11 @@ body:
     {
       "category": "ELEKTRONIK",
       "title": "MacBook Pro M2",
-      "description": "Mulus ex-developer",
+      "description": "Kondisi mulus, ex-developer IF-48-12.",
       "condition": "BEKAS_BAIK",
       "startingPrice": 15000000,
       "duration": 5,
-      "buyNowPrice": 18000000,
+      "buyNowPrice": 20000000,
       "brand": "Apple",
       "type": "Laptop",
       "warrantyStatus": true
@@ -24,6 +24,6 @@ auth:
     token: "{{seller_token}}"
 scripts:
   - type: afterResponse
-    code: pm.collectionVariables.set('auction_elek_id', pm.response.json().auctionId);
+    code: pm.collectionVariables.set('demo_auction_id', pm.response.json().auctionId);
     language: text/javascript
 order: 1000

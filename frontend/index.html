@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BidKita</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Bid<span>Kita</span></div>
+  <nav>
+    <button class="nav-btn" id="btn-browse" data-view="browse">Jelajahi</button>
+    <button class="nav-btn hidden" id="btn-create-auction" data-view="create-auction">Buat Lelang</button>
+    <button class="nav-btn hidden" id="btn-seller-dashboard" data-view="seller-dashboard">Lelang Saya</button>
+    <button class="nav-btn hidden" id="btn-buyer-dashboard" data-view="buyer-dashboard">Riwayat Bid</button>
+    <button class="nav-btn hidden" id="btn-wallet" data-view="wallet">Wallet</button>
+    <button class="nav-btn hidden" id="btn-admin" data-view="admin">Admin</button>
+    <button class="nav-btn hidden" id="btn-notifications" data-view="notifications">Notifikasi</button>
+  </nav>
+  <div class="nav-right">
+    <button class="nav-btn" id="btn-login" data-view="auth">Login / Daftar</button>
+    <div class="user-box hidden" id="nav-user">
+      <span id="user-label"></span>
+      <button class="btn-link" id="btn-logout">Logout</button>
+    </div>
+    <button class="gear" id="btn-settings" title="Atur API Base URL">&#9881;</button>
+  </div>
+</header>
+
+<div id="banner" class="banner hidden"></div>
+
+<main>
+
+  <!-- AUTH VIEW -->
+  <section class="view hidden" id="view-auth">
+    <div class="auth-card">
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-login">Login</button>
+        <button class="tab-btn" id="tab-register">Daftar</button>
+      </div>
+
+      <form id="login-form" class="form">
+        <label>Email</label>
+        <input type="email" id="login-email" required placeholder="buyer1@bidkita.com">
+        <label>Password</label>
+        <input type="password" id="login-password" required placeholder="••••••••">
+        <button type="submit" class="btn-primary">Login</button>
+      </form>
+
+      <form id="register-form" class="form hidden">
+        <label>Username</label>
+        <input type="text" id="reg-username" required minlength="3" placeholder="min. 3 karakter">
+        <label>Email</label>
+        <input type="email" id="reg-email" required placeholder="nama@email.com">
+        <label>Password</label>
+        <input type="password" id="reg-password" required placeholder="••••••••">
+        <label>No. HP</label>
+        <input type="text" id="reg-phone" required placeholder="08xxxxxxxxxx atau +62xxxxxxxxxx">
+        <label>Daftar sebagai</label>
+        <select id="reg-role">
+          <option value="BUYER">Buyer (Pembeli)</option>
+          <option value="SELLER">Seller (Penjual)</option>
+        </select>
+        <button type="submit" class="btn-primary">Daftar</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- BROWSE VIEW -->
+  <section class="view hidden" id="view-browse">
+    <div class="browse-layout">
+      <aside class="filters">
+        <h3>Filter</h3>
+        <label>Kategori</label>
+        <select id="filter-category">
+          <option value="">Semua</option>
+          <option value="ELEKTRONIK">Elektronik</option>
+          <option value="FASHION">Fashion</option>
+          <option value="BUKU">Buku</option>
+          <option value="KENDARAAN">Kendaraan</option>
+        </select>
+        <label>Status</label>
+        <select id="filter-status">
+          <option value="">Semua</option>
+          <option value="PENDING">Pending</option>
+          <option value="OPEN">Open</option>
+          <option value="CLOSING">Closing</option>
+          <option value="SOLD">Sold</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+        <label>Harga Min</label>
+        <input type="number" id="filter-min" placeholder="0">
+        <label>Harga Max</label>
+        <input type="number" id="filter-max" placeholder="tanpa batas">
+        <button class="btn-primary" id="btn-apply-filter">Terapkan</button>
+        <button class="btn-link" id="btn-reset-filter">Reset</button>
+      </aside>
+      <div class="browse-content">
+        <h2>Lelang</h2>
+        <div id="auction-grid" class="auction-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DETAIL VIEW -->
+  <section class="view hidden" id="view-detail">
+    <button class="btn-link" id="btn-back-browse">&larr; Kembali</button>
+    <div class="detail-card" id="detail-card"></div>
+  </section>
+
+  <!-- CREATE AUCTION VIEW -->
+  <section class="view hidden" id="view-create-auction">
+    <h2>Buat Listing Lelang</h2>
+    <form id="create-auction-form" class="form card">
+      <label>Kategori</label>
+      <select id="ca-category" required>
+        <option value="ELEKTRONIK">Elektronik</option>
+        <option value="FASHION">Fashion</option>
+        <option value="BUKU">Buku</option>
+        <option value="KENDARAAN">Kendaraan</option>
+      </select>
+
+      <label>Judul Barang</label>
+      <input type="text" id="ca-title" required placeholder="e.g. iPhone 13 Pro 256GB">
+
+      <label>Deskripsi</label>
+      <textarea id="ca-description" required placeholder="Jelaskan kondisi, kelengkapan, dll."></textarea>
+
+      <label>Kondisi</label>
+      <select id="ca-condition" required>
+        <option value="BARU">Baru</option>
+        <option value="BEKAS_BAIK">Bekas Baik</option>
+        <option value="BEKAS_RUSAK">Bekas Rusak</option>
+      </select>
+
+      <label>Foto (opsional)</label>
+      <input type="file" id="ca-image" accept="image/*">
+      <img id="ca-image-preview" class="image-preview hidden">
+
+      <label>Harga Awal (Rp)</label>
+      <input type="number" id="ca-starting-price" required min="1" placeholder="500000">
+
+      <label>Durasi Lelang (hari)</label>
+      <input type="number" id="ca-duration" required min="1" placeholder="7">
+
+      <label>Harga Beli Langsung (opsional, Rp)</label>
+      <input type="number" id="ca-buynow-price" placeholder="kosongkan jika tidak ada">
+
+      <div class="cond-fields" id="fields-ELEKTRONIK">
+        <label>Brand</label>
+        <input type="text" id="ca-elec-brand" placeholder="Samsung, Apple, dll.">
+        <label>Tipe</label>
+        <input type="text" id="ca-elec-type" placeholder="Smartphone, Laptop, dll.">
+        <label class="checkbox-label"><input type="checkbox" id="ca-elec-warranty"> Masih bergaransi</label>
+      </div>
+
+      <div class="cond-fields hidden" id="fields-FASHION">
+        <label>Brand</label>
+        <input type="text" id="ca-fashion-brand">
+        <label>Ukuran</label>
+        <input type="text" id="ca-fashion-size">
+        <label>Material</label>
+        <input type="text" id="ca-fashion-material">
+      </div>
+
+      <div class="cond-fields hidden" id="fields-BUKU">
+        <label>Penulis</label>
+        <input type="text" id="ca-book-author">
+        <label>Penerbit</label>
+        <input type="text" id="ca-book-publisher">
+        <label>Tahun Terbit</label>
+        <input type="number" id="ca-book-year">
+      </div>
+
+      <div class="cond-fields hidden" id="fields-KENDARAAN">
+        <label>Brand</label>
+        <input type="text" id="ca-vehicle-brand">
+        <label>Tahun</label>
+        <input type="number" id="ca-vehicle-year">
+        <label>Kilometer</label>
+        <input type="number" id="ca-vehicle-mileage">
+        <label>No. Plat</label>
+        <input type="text" id="ca-vehicle-plat">
+      </div>
+
+      <button type="submit" class="btn-primary">Publikasikan Lelang</button>
+    </form>
+  </section>
+
+  <!-- SELLER DASHBOARD VIEW -->
+  <section class="view hidden" id="view-seller-dashboard">
+    <h2>Lelang Saya</h2>
+    <div id="seller-auction-list" class="list-stack"></div>
+  </section>
+
+  <!-- BUYER DASHBOARD VIEW -->
+  <section class="view hidden" id="view-buyer-dashboard">
+    <h2>Riwayat Bid Saya</h2>
+    <div id="buyer-bid-list" class="list-stack"></div>
+  </section>
+
+  <!-- WALLET VIEW -->
+  <section class="view hidden" id="view-wallet">
+    <h2>Wallet</h2>
+    <div class="wallet-balance card" id="wallet-balance">Memuat...</div>
+    <form id="topup-form" class="form card">
+      <h3>Top Up</h3>
+      <label>Nominal (Rp)</label>
+      <input type="number" id="topup-amount" required min="1" placeholder="100000">
+      <label>Metode Pembayaran</label>
+      <select id="topup-method">
+        <option value="BANK_TRANSFER">Transfer Bank</option>
+        <option value="QRIS">QRIS</option>
+        <option value="E_WALLET">E-Wallet</option>
+      </select>
+      <button type="submit" class="btn-primary">Konfirmasi Top Up</button>
+    </form>
+    <h3>Riwayat Transaksi</h3>
+    <div id="wallet-transactions" class="list-stack"></div>
+  </section>
+
+  <!-- NOTIFICATIONS VIEW -->
+  <section class="view hidden" id="view-notifications">
+    <h2>Notifikasi</h2>
+    <div id="notification-list" class="list-stack"></div>
+  </section>
+
+  <!-- ADMIN VIEW -->
+  <section class="view hidden" id="view-admin">
+    <h2>Panel Admin</h2>
+    <div class="tabs">
+      <button class="tab-btn active" id="admin-tab-auctions">Lelang</button>
+      <button class="tab-btn" id="admin-tab-users">Pengguna</button>
+    </div>
+    <div id="admin-auctions" class="list-stack"></div>
+    <div id="admin-users" class="list-stack hidden"></div>
+  </section>
+
+</main>
+
+<footer>
+  BidKita — UI sederhana untuk testing API (PBO IF-48-12 Kelompok 2)
+</footer>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

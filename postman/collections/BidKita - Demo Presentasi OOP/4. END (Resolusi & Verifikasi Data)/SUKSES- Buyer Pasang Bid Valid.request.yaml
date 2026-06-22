@@ -1,6 +1,6 @@
 $kind: http-request
-name: "4. GAGAL: Bid Terlalu Rendah (Encapsulation)"
-url: "{{base_url}}/api/auctions/{{auction_elek_id}}/bid"
+name: "SUKSES: Buyer Pasang Bid Valid"
+url: "{{base_url}}/api/auctions/{{demo_auction_id}}/bid"
 method: POST
 headers:
   Content-Type: application/json
@@ -8,10 +8,10 @@ body:
   type: text
   content: |-
     {
-      "amount": 1000000
+      "amount": 16000000
     }
 auth:
   type: bearer
   credentials:
     token: "{{buyer_token}}"
-order: 5000
+order: 1000

@@ -1,0 +1,17 @@
+$kind: http-request
+name: "GAGAL 2: Saldo Wallet Kurang"
+url: "{{base_url}}/api/auctions/{{demo_auction_id}}/bid"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "amount": 16000000
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{buyer_token}}"
+order: 3000

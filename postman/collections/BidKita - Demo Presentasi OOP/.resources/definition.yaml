@@ -1,9 +1,8 @@
 $kind: collection
-description: Koleksi khusus live demo presentasi. Fokus pada Inheritance (Item), Polymorphism, dan Encapsulation (Validasi Bid).
+description: "Skenario presentasi OOP: Start, Process, Exception, End."
 variables:
   base_url: http://localhost:8080
   admin_token: ""
   seller_token: ""
   buyer_token: ""
-  auction_elek_id: ""
-  auction_fash_id: ""
+  demo_auction_id: ""

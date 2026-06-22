@@ -1,12 +1,12 @@
 {
   "info": {
     "name": "BidKita - Demo Presentasi OOP",
-    "description": "Koleksi khusus live demo presentasi. Fokus pada Inheritance (Item), Polymorphism, dan Encapsulation (Validasi Bid).",
+    "description": "Skenario presentasi OOP: Start, Process, Exception, End.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "1. Persiapan (Login)",
+      "name": "1. START (Persiapan)",
       "item": [
         {
           "name": "Login Admin",
@@ -41,41 +41,58 @@
       ]
     },
     {
-      "name": "2. Demo OOP & Bisnis",
+      "name": "2. PROCESS (Inisiasi Bisnis)",
       "item": [
         {
-          "name": "1a. Buat Item Elektronik (Inheritance)",
+          "name": "Seller Buat Lelang",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": { "raw": "{{base_url}}/api/auctions", "host": ["{{base_url}}"], "path": ["api", "auctions"] },
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{seller_token}}", "type": "string" }] },
-            "body": { "mode": "raw", "raw": "{\n  \"category\": \"ELEKTRONIK\",\n  \"title\": \"MacBook Pro M2\",\n  \"description\": \"Mulus ex-developer\",\n  \"condition\": \"BEKAS_BAIK\",\n  \"startingPrice\": 15000000,\n  \"duration\": 5,\n  \"buyNowPrice\": 18000000,\n  \"brand\": \"Apple\",\n  \"type\": \"Laptop\",\n  \"warrantyStatus\": true\n}" }
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"ELEKTRONIK\",\n  \"title\": \"MacBook Pro M2\",\n  \"description\": \"Kondisi mulus, ex-developer IF-48-12.\",\n  \"condition\": \"BEKAS_BAIK\",\n  \"startingPrice\": 15000000,\n  \"duration\": 5,\n  \"buyNowPrice\": 20000000,\n  \"brand\": \"Apple\",\n  \"type\": \"Laptop\",\n  \"warrantyStatus\": true\n}"
+            }
           },
-          "event": [{ "listen": "test", "script": { "exec": ["pm.collectionVariables.set('auction_elek_id', pm.response.json().auctionId);"] } }]
-        },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.collectionVariables.set('demo_auction_id', pm.response.json().auctionId);"] } }]
+        }
+      ]
+    },
+    {
+      "name": "3. EXCEPTION (Uji Validasi OOP)",
+      "item": [
         {
-          "name": "1b. Buat Item Fashion (Polymorphism)",
+          "name": "GAGAL 1: Bid Lelang PENDING",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/api/auctions", "host": ["{{base_url}}"], "path": ["api", "auctions"] },
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{seller_token}}", "type": "string" }] },
-            "body": { "mode": "raw", "raw": "{\n  \"category\": \"FASHION\",\n  \"title\": \"Sepatu Jordan 1\",\n  \"description\": \"Jarang dipakai\",\n  \"condition\": \"BEKAS_BAIK\",\n  \"startingPrice\": 2000000,\n  \"duration\": 3,\n  \"brand\": \"Nike\",\n  \"size\": \"42\",\n  \"material\": \"Leather\"\n}" }
-          },
-          "event": [{ "listen": "test", "script": { "exec": ["pm.collectionVariables.set('auction_fash_id', pm.response.json().auctionId);"] } }]
+            "url": { "raw": "{{base_url}}/api/auctions/{{demo_auction_id}}/bid", "host": ["{{base_url}}"], "path": ["api", "auctions", "{{demo_auction_id}}", "bid"] },
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{buyer_token}}", "type": "string" }] },
+            "body": { "mode": "raw", "raw": "{\n  \"amount\": 16000000\n}" }
+          }
         },
         {
-          "name": "2. Admin Approve Lelang Elektronik",
+          "name": "Admin Approve Lelang (Buka Akses)",
           "request": {
             "method": "PUT",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/api/auctions/{{auction_elek_id}}/approve", "host": ["{{base_url}}"], "path": ["api", "auctions", "{{auction_elek_id}}", "approve"] },
+            "url": { "raw": "{{base_url}}/api/auctions/{{demo_auction_id}}/approve", "host": ["{{base_url}}"], "path": ["api", "auctions", "{{demo_auction_id}}", "approve"] },
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }] }
           }
         },
         {
-          "name": "3. Buyer Top Up Wallet",
+          "name": "GAGAL 2: Saldo Wallet Kurang",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/auctions/{{demo_auction_id}}/bid", "host": ["{{base_url}}"], "path": ["api", "auctions", "{{demo_auction_id}}", "bid"] },
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{buyer_token}}", "type": "string" }] },
+            "body": { "mode": "raw", "raw": "{\n  \"amount\": 16000000\n}" }
+          }
+        },
+        {
+          "name": "Buyer Top Up Wallet",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -85,32 +102,55 @@
           }
         },
         {
-          "name": "4. GAGAL: Bid Terlalu Rendah (Encapsulation)",
+          "name": "GAGAL 3: Bid Terlalu Rendah",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/api/auctions/{{auction_elek_id}}/bid", "host": ["{{base_url}}"], "path": ["api", "auctions", "{{auction_elek_id}}", "bid"] },
+            "url": { "raw": "{{base_url}}/api/auctions/{{demo_auction_id}}/bid", "host": ["{{base_url}}"], "path": ["api", "auctions", "{{demo_auction_id}}", "bid"] },
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{buyer_token}}", "type": "string" }] },
-            "body": { "mode": "raw", "raw": "{\n  \"amount\": 1000000\n}" }
+            "body": { "mode": "raw", "raw": "{\n  \"amount\": 10000000\n}" }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "4. END (Resolusi & Verifikasi Data)",
+      "item": [
         {
-          "name": "5. SUKSES: Buyer Pasang Bid Valid",
+          "name": "SUKSES: Buyer Pasang Bid Valid",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/api/auctions/{{auction_elek_id}}/bid", "host": ["{{base_url}}"], "path": ["api", "auctions", "{{auction_elek_id}}", "bid"] },
+            "url": { "raw": "{{base_url}}/api/auctions/{{demo_auction_id}}/bid", "host": ["{{base_url}}"], "path": ["api", "auctions", "{{demo_auction_id}}", "bid"] },
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{buyer_token}}", "type": "string" }] },
             "body": { "mode": "raw", "raw": "{\n  \"amount\": 16000000\n}" }
           }
         },
         {
-          "name": "6. Buyer Buy Now",
+          "name": "SUKSES: Buyer Buy Now (Lelang Selesai)",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/api/auctions/{{auction_elek_id}}/buynow", "host": ["{{base_url}}"], "path": ["api", "auctions", "{{auction_elek_id}}", "buynow"] },
+            "url": { "raw": "{{base_url}}/api/auctions/{{demo_auction_id}}/buynow", "host": ["{{base_url}}"], "path": ["api", "auctions", "{{demo_auction_id}}", "buynow"] },
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{buyer_token}}", "type": "string" }] }
+          }
+        },
+        {
+          "name": "Verifikasi 1: Saldo Wallet Terpotong",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/api/wallet", "host": ["{{base_url}}"], "path": ["api", "wallet"] },
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{buyer_token}}", "type": "string" }] }
+          }
+        },
+        {
+          "name": "Verifikasi 2: Notifikasi Barang Terjual (Seller)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/api/notifications", "host": ["{{base_url}}"], "path": ["api", "notifications"] },
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{seller_token}}", "type": "string" }] }
           }
         }
       ]
@@ -121,7 +161,6 @@
     { "key": "admin_token", "value": "", "type": "string" },
     { "key": "seller_token", "value": "", "type": "string" },
     { "key": "buyer_token", "value": "", "type": "string" },
-    { "key": "auction_elek_id", "value": "", "type": "string" },
-    { "key": "auction_fash_id", "value": "", "type": "string" }
+    { "key": "demo_auction_id", "value": "", "type": "string" }
   ]
 }

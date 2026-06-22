@@ -7,7 +7,7 @@ workspace:
 cloudResources:
   collections:
     ..\postman\collections\BidKita - Full Automated Test Suite: 24d335f2-046c-43cc-be80-5df795f8f0d6
-    ..\postman\collections\BidKita - Demo Presentasi OOP: aeb102cc-b0b8-42b5-8176-a1e6d8663d64
+    ..\postman\collections\BidKita - Demo Presentasi OOP: 7eb21e63-5bcc-4ae8-aa94-fd06d81c3687
 
 # All resources in the `postman/` folder are automatically registered in Local View.
 # Point to additional files outside the `postman/` folder to register them individually. Example:

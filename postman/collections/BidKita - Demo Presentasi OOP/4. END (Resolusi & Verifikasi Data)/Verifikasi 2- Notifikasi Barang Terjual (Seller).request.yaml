@@ -1,0 +1,9 @@
+$kind: http-request
+name: "Verifikasi 2: Notifikasi Barang Terjual (Seller)"
+url: "{{base_url}}/api/notifications"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{seller_token}}"
+order: 4000
